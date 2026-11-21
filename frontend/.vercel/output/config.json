@@ -1,0 +1,64 @@
+{
+	"version": 3,
+	"routes": [
+		{
+			"src": ".*",
+			"continue": true,
+			"transforms": [
+				{
+					"type": "request.query",
+					"op": "delete",
+					"target": {
+						"key": "__pathname"
+					}
+				}
+			]
+		},
+		{
+			"src": "/_app/immutable/.+",
+			"headers": {
+				"cache-control": "public, immutable, max-age=31536000"
+			}
+		},
+		{
+			"handle": "filesystem"
+		},
+		{
+			"src": "/_app/immutable/.+",
+			"status": 404,
+			"headers": {
+				"cache-control": "no-store"
+			},
+			"continue": false
+		},
+		{
+			"src": "^/?(?:/__data.json)?$",
+			"dest": "/"
+		},
+		{
+			"src": "^/admin/?(?:/__data.json)?$",
+			"dest": "/admin"
+		},
+		{
+			"src": "^/carrinho/?(?:/__data.json)?$",
+			"dest": "/carrinho"
+		},
+		{
+			"src": "^/checkout/?(?:/__data.json)?$",
+			"dest": "/checkout"
+		},
+		{
+			"src": "^/pedido/([^/]+?)/?(?:/__data.json)?$",
+			"dest": "/pedido/[id]"
+		},
+		{
+			"src": "^/produto/([^/]+?)/?(?:/__data.json)?$",
+			"dest": "/produto/[slug]"
+		},
+		{
+			"src": "/.*",
+			"dest": "/![-]/catchall"
+		}
+	],
+	"overrides": {}
+}
