@@ -9,12 +9,15 @@
     ['enviado', 'Enviado'],
     ['cancelado', 'Cancelado']
   ];
+  const TIPOS_IMAGEM = 'image/jpeg,image/png,image/webp';
+  const MAX_IMAGEM = 5 * 1024 * 1024;
 
   let autenticado = $state(false);
   let chaveInput = $state('');
   let aba = $state('produtos');
   let produtos = $state([]);
   let pedidos = $state([]);
+  let enviando = $state(false);
   let msg = $state({ tipo: '', texto: '' });
 
   const avisar = (tipo, texto) => (msg = { tipo, texto });
@@ -115,6 +118,41 @@
     return executar(() => admin.status(ped.id, novo), 'Situação do pedido atualizada.');
   }
 
+  // ----- Imagens -----
+  async function subir(arquivo) {
+    if (arquivo.size > MAX_IMAGEM) {
+      avisar('erro', 'A imagem deve ter até 5 MB.');
+      return null;
+    }
+    enviando = true;
+    try {
+      const r = await admin.enviarImagem(arquivo);
+      avisar('ok', 'Imagem enviada.');
+      return r.url;
+    } catch (e) {
+      avisar('erro', e.message);
+      return null;
+    } finally {
+      enviando = false;
+    }
+  }
+
+  async function imagemNovo(ev) {
+    const arquivo = ev.currentTarget.files?.[0];
+    if (!arquivo) return;
+    const url = await subir(arquivo);
+    if (url) novo.imagem_url = url;
+  }
+
+  async function trocarImagem(p, ev) {
+    const arquivo = ev.currentTarget.files?.[0];
+    if (!arquivo) return;
+    const url = await subir(arquivo);
+    if (url) {
+      await executar(() => admin.editarProduto(p.id, { imagem_url: url }), 'Imagem do produto atualizada.');
+    }
+  }
+
   // ----- Novo produto -----
   const vazio = () => ({
     nome: '', slug: '', preco: '', descricao: '', imagem_url: '',
@@ -210,9 +248,19 @@
         <label class="campo">Descrição
           <input bind:value={novo.descricao} />
         </label>
-        <label class="campo">URL da imagem
-          <input bind:value={novo.imagem_url} type="url" placeholder="https://…" />
-        </label>
+
+        <div class="imagem-produto">
+          <label class="campo">Imagem do produto (JPG, PNG ou WebP, até 5 MB)
+            <input type="file" accept={TIPOS_IMAGEM} onchange={imagemNovo} disabled={enviando} />
+          </label>
+          {#if enviando}<p class="dica">Enviando imagem…</p>{/if}
+          {#if novo.imagem_url}
+            <img class="mini" src={novo.imagem_url} alt="Pré-visualização da imagem enviada" />
+          {/if}
+          <label class="campo">Ou cole o endereço de uma imagem
+            <input bind:value={novo.imagem_url} type="url" placeholder="https://…" />
+          </label>
+        </div>
 
         <fieldset class="grade">
           <legend>Grade de variações</legend>
@@ -251,7 +299,7 @@
           {/if}
         </fieldset>
 
-        <button class="btn btn-primario">Criar produto</button>
+        <button class="btn btn-primario" disabled={enviando}>Criar produto</button>
       </form>
     </details>
 
@@ -265,6 +313,17 @@
           {p.nome} — {brl(p.preco_centavos)}
           {#if !p.ativo}<span class="etiqueta">Oculto na loja</span>{/if}
         </summary>
+
+        <div class="imagem-produto">
+          {#if p.imagem_url}
+            <img class="mini" src={p.imagem_url} alt={p.nome} />
+          {:else}
+            <p class="dica">Este produto ainda não tem imagem.</p>
+          {/if}
+          <label class="campo">{p.imagem_url ? 'Trocar imagem' : 'Enviar imagem'}
+            <input type="file" accept={TIPOS_IMAGEM} onchange={(ev) => trocarImagem(p, ev)} disabled={enviando} />
+          </label>
+        </div>
 
         <div class="edicao">
           <label class="campo">Nome <input bind:value={p.nome} /></label>
@@ -340,6 +399,8 @@
   .etiqueta { background: var(--fita); color: var(--tinta); padding: 0 0.5rem; margin-left: 0.5rem; font-size: 0.85rem; font-weight: 500; }
   .edicao { display: grid; gap: 0.5rem; max-width: 420px; margin: 1rem 0; }
   .check { display: flex; gap: 0.5rem; align-items: center; }
+  .imagem-produto { display: grid; gap: 0.5rem; margin: 1rem 0; max-width: 420px; }
+  .mini { width: 96px; height: 128px; object-fit: cover; border: 2px solid var(--linha); }
   table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
   th, td { text-align: left; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--linha); }
   td input, .nova-variante input, select { font: inherit; padding: 0.4rem; border: 2px solid var(--linha); background: var(--branco); color: var(--tinta); width: 100%; min-width: 4rem; }

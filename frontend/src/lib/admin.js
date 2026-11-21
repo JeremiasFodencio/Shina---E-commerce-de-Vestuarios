@@ -14,16 +14,17 @@ function falha(mensagem, status) {
   return e;
 }
 
-async function req(metodo, caminho, corpo) {
+async function enviar(metodo, caminho, corpo, ehFormData = false) {
   let r;
   try {
     r = await fetch(BASE + caminho, {
       method: metodo,
       headers: {
         'x-admin-key': lerChave(),
-        ...(corpo ? { 'content-type': 'application/json' } : {})
+        // com FormData o navegador define o content-type (com o boundary) sozinho
+        ...(corpo && !ehFormData ? { 'content-type': 'application/json' } : {})
       },
-      body: corpo ? JSON.stringify(corpo) : undefined
+      body: corpo ? (ehFormData ? corpo : JSON.stringify(corpo)) : undefined
     });
   } catch {
     throw falha('Servidor indisponível. Tente novamente em instantes.', 503);
@@ -33,6 +34,8 @@ async function req(metodo, caminho, corpo) {
   return json;
 }
 
+const req = (metodo, caminho, corpo) => enviar(metodo, caminho, corpo);
+
 export const admin = {
   produtos: () => req('GET', '/api/admin/produtos'),
   criarProduto: (p) => req('POST', '/api/admin/produtos', p),
@@ -41,5 +44,10 @@ export const admin = {
   estoque: (sku, estoque) =>
     req('PATCH', `/api/admin/variantes/${encodeURIComponent(sku)}/estoque`, { estoque }),
   pedidos: () => req('GET', '/api/admin/pedidos'),
-  status: (id, status) => req('PATCH', `/api/admin/pedidos/${id}/status`, { status })
+  status: (id, status) => req('PATCH', `/api/admin/pedidos/${id}/status`, { status }),
+  enviarImagem: (arquivo) => {
+    const dados = new FormData();
+    dados.append('arquivo', arquivo);
+    return enviar('POST', '/api/admin/imagens', dados, true);
+  }
 };

@@ -11,6 +11,8 @@ pub enum Erro {
     Conflito(String),
     #[error("não autorizado")]
     NaoAutorizado,
+    #[error("{0}")]
+    Externo(String),
     #[error("erro de banco: {0}")]
     Banco(sqlx::Error),
 }
@@ -37,6 +39,7 @@ impl IntoResponse for Erro {
             Erro::Invalido(m) => (StatusCode::BAD_REQUEST, m.clone()),
             Erro::Conflito(m) => (StatusCode::CONFLICT, m.clone()),
             Erro::NaoAutorizado => (StatusCode::UNAUTHORIZED, self.to_string()),
+            Erro::Externo(m) => (StatusCode::BAD_GATEWAY, m.clone()),
             Erro::Banco(e) => {
                 tracing::error!("{e}");
                 (StatusCode::INTERNAL_SERVER_ERROR, "erro interno".to_string())

@@ -7,7 +7,7 @@ use sqlx::FromRow;
 use std::collections::HashMap;
 use uuid::Uuid;
 
-fn autorizar(h: &HeaderMap, e: &Estado) -> Resultado<()> {
+pub fn autorizar(h: &HeaderMap, e: &Estado) -> Resultado<()> {
     match h.get("x-admin-key").and_then(|v| v.to_str().ok()) {
         Some(k) if k == e.admin_key.as_str() => Ok(()),
         _ => Err(Erro::NaoAutorizado),

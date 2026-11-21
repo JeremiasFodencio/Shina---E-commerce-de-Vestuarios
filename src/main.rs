@@ -2,8 +2,10 @@ mod admin;
 mod catalogo;
 mod erro;
 mod pedidos;
+mod upload;
 
 use axum::{
+    extract::DefaultBodyLimit,
     http::{HeaderValue, Method},
     routing::{get, patch, post},
     Router,
@@ -12,10 +14,19 @@ use sqlx::{postgres::{PgConnectOptions, PgPoolOptions}, PgPool};
 use std::{env, error::Error, str::FromStr, sync::Arc};
 use tower_http::{cors::{Any, CorsLayer}, trace::TraceLayer};
 
+/// Configuração do Supabase Storage (somente servidor: a chave é secreta)
+pub struct Storage {
+    pub url: String,
+    pub chave: String,
+    pub bucket: String,
+    pub http: reqwest::Client,
+}
+
 #[derive(Clone)]
 pub struct Estado {
     pub db: PgPool,
     pub admin_key: Arc<String>,
+    pub storage: Option<Arc<Storage>>,
 }
 
 #[tokio::main]
@@ -31,9 +42,23 @@ async fn main() -> Result<(), Box<dyn Error>> {
         return Err("ADMIN_API_KEY deve ter pelo menos 16 caracteres".into());
     }
 
-    // Sem cache de prepared statements: seguro tanto no Session quanto no Transaction Pooler.
     let opts = PgConnectOptions::from_str(&database_url)?.statement_cache_capacity(0);
     let db = PgPoolOptions::new().max_connections(5).connect_with(opts).await?;
+
+    let storage = match (env::var("SUPABASE_URL"), env::var("SUPABASE_SERVICE_ROLE_KEY")) {
+        (Ok(url), Ok(chave)) if !url.trim().is_empty() && !chave.trim().is_empty() => {
+            Some(Arc::new(Storage {
+                url: url.trim().trim_end_matches('/').to_string(),
+                chave: chave.trim().to_string(),
+                bucket: env::var("SUPABASE_BUCKET").unwrap_or_else(|_| "produtos".into()),
+                http: reqwest::Client::new(),
+            }))
+        }
+        _ => {
+            tracing::warn!("SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY ausentes: upload de imagens desativado");
+            None
+        }
+    };
 
     let cors = CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::PATCH])
@@ -43,7 +68,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Some(o) => cors.allow_origin(o.parse::<HeaderValue>()?),
     };
 
-    let estado = Estado { db, admin_key: Arc::new(admin_key) };
+    let estado = Estado { db, admin_key: Arc::new(admin_key), storage };
 
     let app = Router::new()
         .route("/health", get(|| async { "ok" }))
@@ -59,6 +84,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .route("/api/admin/variantes/:sku/estoque", patch(admin::ajustar_estoque))
         .route("/api/admin/pedidos", get(admin::listar_pedidos))
         .route("/api/admin/pedidos/:id/status", patch(admin::mudar_status))
+        .route("/api/admin/imagens", post(upload::enviar))
+        .layer(DefaultBodyLimit::max(6 * 1024 * 1024))
         .layer(cors)
         .layer(TraceLayer::new_for_http())
         .with_state(estado);
