@@ -29,7 +29,7 @@ declare module "$app/types" {
 	type MatcherParam<M> = M extends (param : string) => param is (infer U extends string) ? U : string;
 
 	export interface AppTypes {
-		RouteId(): "/" | "/admin" | "/carrinho" | "/checkout" | "/pedido" | "/pedido/[id]" | "/produto" | "/produto/[slug]";
+		RouteId(): "/" | "/admin" | "/ajuda" | "/carrinho" | "/checkout" | "/favoritos" | "/pedido" | "/pedido/[id]" | "/produto" | "/produto/[slug]";
 		RouteParams(): {
 			"/pedido/[id]": { id: string };
 			"/produto/[slug]": { slug: string }
@@ -37,14 +37,16 @@ declare module "$app/types" {
 		LayoutParams(): {
 			"/": { id?: string | undefined; slug?: string | undefined };
 			"/admin": Record<string, never>;
+			"/ajuda": Record<string, never>;
 			"/carrinho": Record<string, never>;
 			"/checkout": Record<string, never>;
+			"/favoritos": Record<string, never>;
 			"/pedido": { id?: string | undefined };
 			"/pedido/[id]": { id: string };
 			"/produto": { slug?: string | undefined };
 			"/produto/[slug]": { slug: string }
 		};
-		Pathname(): "/" | "/admin" | "/carrinho" | "/checkout" | `/pedido/${string}` & {} | `/produto/${string}` & {};
+		Pathname(): "/" | "/admin" | "/ajuda" | "/carrinho" | "/checkout" | "/favoritos" | `/pedido/${string}` & {} | `/produto/${string}` & {};
 		ResolvedPathname(): `${"" | `/${string}`}${ReturnType<AppTypes['Pathname']>}`;
 		Asset(): string & {};
 	}

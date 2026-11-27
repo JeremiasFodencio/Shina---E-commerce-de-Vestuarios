@@ -11,6 +11,30 @@
       "_shared-server.js"
     ]
   },
+  "_Icone.js": {
+    "file": "chunks/Icone.js",
+    "name": "Icone",
+    "imports": [
+      "_index.js"
+    ]
+  },
+  "_ProdutoCartao.DrKx7UET.css": {
+    "file": "_app/immutable/assets/ProdutoCartao.DrKx7UET.css",
+    "src": "_ProdutoCartao.DrKx7UET.css"
+  },
+  "_ProdutoCartao.js": {
+    "file": "chunks/ProdutoCartao.js",
+    "name": "ProdutoCartao",
+    "imports": [
+      "_index.js",
+      "_formato.js",
+      "_favoritos.svelte.js",
+      "_Icone.js"
+    ],
+    "css": [
+      "_app/immutable/assets/ProdutoCartao.DrKx7UET.css"
+    ]
+  },
   "_api.js": {
     "file": "chunks/api.js",
     "name": "api",
@@ -22,17 +46,13 @@
     "file": "chunks/carrinho.svelte.js",
     "name": "carrinho.svelte"
   },
-  "_config.js": {
-    "file": "chunks/config.js",
-    "name": "config"
-  },
-  "_escaping.js": {
-    "file": "chunks/escaping.js",
-    "name": "escaping"
-  },
   "_exports.js": {
     "file": "chunks/exports.js",
     "name": "exports"
+  },
+  "_favoritos.svelte.js": {
+    "file": "chunks/favoritos.svelte.js",
+    "name": "favoritos.svelte"
   },
   "_formato.js": {
     "file": "chunks/formato.js",
@@ -40,9 +60,17 @@
   },
   "_index.js": {
     "file": "chunks/index.js",
+    "name": "index"
+  },
+  "_index2.js": {
+    "file": "chunks/index2.js",
     "name": "index",
     "imports": [
-      "_escaping.js"
+      "_state.svelte.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_index.js"
     ]
   },
   "_internal.js": {
@@ -122,11 +150,11 @@
     "isEntry": true,
     "imports": [
       "_index.js",
-      "_state.svelte.js",
-      "_exports.js",
-      "_utils2.js",
-      "_root.js",
-      "_escaping.js"
+      "_index2.js",
+      "_Icone.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_error.X0Is59KG.css"
     ]
   },
   "src/routes/+layout.svelte": {
@@ -135,12 +163,19 @@
     "src": "src/routes/+layout.svelte",
     "isEntry": true,
     "imports": [
-      "_escaping.js",
+      "_index.js",
+      "_exports.js",
+      "_utils2.js",
+      "_root.js",
+      "_state.svelte.js",
+      "_index2.js",
       "_carrinho.svelte.js",
-      "_config.js"
+      "_favoritos.svelte.js",
+      "_formato.js",
+      "_Icone.js"
     ],
     "css": [
-      "_app/immutable/assets/_layout.BFk4WlYa.css"
+      "_app/immutable/assets/_layout.V9weJXku.css"
     ]
   },
   "src/routes/+page.js": {
@@ -160,8 +195,11 @@
     "imports": [
       "_index.js",
       "_formato.js",
-      "_config.js",
-      "_escaping.js"
+      "_ProdutoCartao.js",
+      "_Icone.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.B0ssbH1F.css"
     ]
   },
   "src/routes/admin/+page.svelte": {
@@ -171,11 +209,24 @@
     "isEntry": true,
     "imports": [
       "_index.js",
-      "_escaping.js",
       "_shared-server.js"
     ],
     "css": [
-      "_app/immutable/assets/_page.B5fOBcLX.css"
+      "_app/immutable/assets/_page.BRk6hNas.css"
+    ]
+  },
+  "src/routes/ajuda/+page.svelte": {
+    "file": "entries/pages/ajuda/_page.svelte.js",
+    "name": "entries/pages/ajuda/_page.svelte",
+    "src": "src/routes/ajuda/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_formato.js",
+      "_Icone.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.ComsLuGV.css"
     ]
   },
   "src/routes/carrinho/+page.svelte": {
@@ -187,7 +238,10 @@
       "_index.js",
       "_formato.js",
       "_carrinho.svelte.js",
-      "_escaping.js"
+      "_Icone.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.FVkm8oIG.css"
     ]
   },
   "src/routes/checkout/+page.svelte": {
@@ -197,14 +251,32 @@
     "isEntry": true,
     "imports": [
       "_index.js",
-      "_escaping.js",
       "_exports.js",
       "_utils2.js",
       "_root.js",
       "_state.svelte.js",
       "_formato.js",
       "_carrinho.svelte.js",
-      "_api.js"
+      "_api.js",
+      "_Icone.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.Cc5H_HgZ.css"
+    ]
+  },
+  "src/routes/favoritos/+page.svelte": {
+    "file": "entries/pages/favoritos/_page.svelte.js",
+    "name": "entries/pages/favoritos/_page.svelte",
+    "src": "src/routes/favoritos/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index.js",
+      "_favoritos.svelte.js",
+      "_ProdutoCartao.js",
+      "_Icone.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.B0JI9rGB.css"
     ]
   },
   "src/routes/pedido/[id]/+page.js": {
@@ -224,7 +296,10 @@
     "imports": [
       "_index.js",
       "_formato.js",
-      "_escaping.js"
+      "_Icone.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.DcyMrUB1.css"
     ]
   },
   "src/routes/produto/[slug]/+page.js": {
@@ -244,8 +319,12 @@
     "imports": [
       "_index.js",
       "_formato.js",
-      "_config.js",
-      "_escaping.js"
+      "_favoritos.svelte.js",
+      "_ProdutoCartao.js",
+      "_Icone.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.C9RIMc-e.css"
     ]
   },
   "virtual:__sveltekit/env": {

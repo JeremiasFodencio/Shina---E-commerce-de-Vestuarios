@@ -1,1 +1,0 @@
-const s=r=>(r/100).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}),c=["PP","P","M","G","GG","XG","XGG","G1","G2","G3"];function a(r){return[...r].sort((n,o)=>{const e=c.indexOf(n.toUpperCase()),t=c.indexOf(o.toUpperCase());return e>=0&&t>=0?e-t:e>=0?-1:t>=0?1:n.localeCompare(o,"pt-BR",{numeric:!0})})}export{s as b,a as o};

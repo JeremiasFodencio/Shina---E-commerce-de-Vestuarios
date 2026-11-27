@@ -1,4 +1,3 @@
-import { e as escape_html } from "./escaping.js";
 import { clsx as clsx$1 } from "clsx";
 import * as devalue from "devalue";
 const DERIVED = 1 << 1;
@@ -136,6 +135,22 @@ function is_boolean_attribute(name) {
 const PASSIVE_EVENTS = ["touchstart", "touchmove"];
 function is_passive_event(name) {
   return PASSIVE_EVENTS.includes(name);
+}
+const ATTR_REGEX = /[&"<]/g;
+const CONTENT_REGEX = /[&<]/g;
+function escape_html(value, is_attr) {
+  const str = String(value ?? "");
+  const pattern = is_attr ? ATTR_REGEX : CONTENT_REGEX;
+  pattern.lastIndex = 0;
+  let escaped = "";
+  let last = 0;
+  while (pattern.test(str)) {
+    const i = pattern.lastIndex - 1;
+    const ch = str[i];
+    escaped += str.substring(last, i) + (ch === "&" ? "&amp;" : ch === '"' ? "&quot;" : "&lt;");
+    last = i + 1;
+  }
+  return escaped + str.substring(last);
 }
 const replacements = {
   translate: /* @__PURE__ */ new Map([
@@ -1283,6 +1298,10 @@ function attr_class(value, hash, directives) {
   var result = to_class(value, hash, directives);
   return result ? ` class="${escape_html(result, true)}"` : "";
 }
+function attr_style(value, directives) {
+  var result = to_style(value, directives);
+  return result ? ` style="${escape_html(result, true)}"` : "";
+}
 function ensure_array_like(array_like_or_iterator) {
   if (array_like_or_iterator) {
     return array_like_or_iterator.length !== void 0 ? array_like_or_iterator : Array.from(array_like_or_iterator);
@@ -1313,65 +1332,68 @@ function derived(fn) {
   };
 }
 export {
-  USER_EFFECT as $,
-  DERIVED as A,
+  EFFECT_PRESERVED as $,
+  BRANCH_EFFECT as A,
   BOUNDARY_EFFECT as B,
   COMMENT_NODE as C,
   DESTROYED as D,
   EFFECT as E,
-  BLOCK_EFFECT as F,
-  ASSIGNED as G,
+  ROOT_EFFECT as F,
+  EAGER_EFFECT as G,
   HYDRATION_ERROR as H,
   INERT as I,
-  ERROR_VALUE as J,
-  ASYNC as K,
-  deferred as L,
+  DIRTY as J,
+  DERIVED as K,
+  BLOCK_EFFECT as L,
   MAYBE_DIRTY as M,
-  REACTION_IS_UPDATING as N,
-  HAS_ABORT_CONTROLLER as O,
-  MANAGED_EFFECT as P,
-  includes as Q,
+  ASSIGNED as N,
+  ERROR_VALUE as O,
+  ASYNC as P,
+  deferred as Q,
   REACTION_RAN as R,
   STATE_SYMBOL as S,
-  index_of as T,
+  REACTION_IS_UPDATING as T,
   UNINITIALIZED as U,
-  STALE_REACTION as V,
-  HEAD_EFFECT as W,
-  EFFECT_PRESERVED as X,
-  EFFECT_TRANSPARENT as Y,
-  PAUSED as Z,
-  RENDER_EFFECT as _,
-  attr as a,
-  array_from as a0,
-  is_passive_event as a1,
-  LEGACY_PROPS as a2,
-  render as a3,
-  setContext as a4,
-  derived as a5,
-  attr_class as a6,
-  HYDRATION_END as b,
-  HYDRATION_START as c,
-  HYDRATION_START_ELSE as d,
-  ensure_array_like as e,
-  HYDRATION_START_FAILED as f,
+  HAS_ABORT_CONTROLLER as V,
+  MANAGED_EFFECT as W,
+  includes as X,
+  index_of as Y,
+  STALE_REACTION as Z,
+  HEAD_EFFECT as _,
+  attr_class as a,
+  EFFECT_TRANSPARENT as a0,
+  PAUSED as a1,
+  RENDER_EFFECT as a2,
+  USER_EFFECT as a3,
+  array_from as a4,
+  is_passive_event as a5,
+  LEGACY_PROPS as a6,
+  render as a7,
+  setContext as a8,
+  attributes as a9,
+  attr as b,
+  ensure_array_like as c,
+  derived as d,
+  escape_html as e,
+  attr_style as f,
   getContext as g,
   head as h,
-  COMPONENT_SYMBOL as i,
-  array_prototype as j,
-  get_descriptor as k,
-  get_prototype_of as l,
-  is_array as m,
+  HYDRATION_END as i,
+  HYDRATION_START as j,
+  HYDRATION_START_ELSE as k,
+  HYDRATION_START_FAILED as l,
+  COMPONENT_SYMBOL as m,
   noop as n,
   object_prototype as o,
-  DESTROYING as p,
-  CONNECTED as q,
+  array_prototype as p,
+  get_descriptor as q,
   run_all as r,
   stringify as s,
-  CLEAN as t,
-  define_property as u,
-  EFFECT_OFFSCREEN as v,
-  BRANCH_EFFECT as w,
-  ROOT_EFFECT as x,
-  EAGER_EFFECT as y,
-  DIRTY as z
+  get_prototype_of as t,
+  is_array as u,
+  DESTROYING as v,
+  CONNECTED as w,
+  CLEAN as x,
+  define_property as y,
+  EFFECT_OFFSCREEN as z
 };

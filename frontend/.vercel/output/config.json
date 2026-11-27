@@ -40,12 +40,20 @@
 			"dest": "/admin"
 		},
 		{
+			"src": "^/ajuda/?(?:/__data.json)?$",
+			"dest": "/ajuda"
+		},
+		{
 			"src": "^/carrinho/?(?:/__data.json)?$",
 			"dest": "/carrinho"
 		},
 		{
 			"src": "^/checkout/?(?:/__data.json)?$",
 			"dest": "/checkout"
+		},
+		{
+			"src": "^/favoritos/?(?:/__data.json)?$",
+			"dest": "/favoritos"
 		},
 		{
 			"src": "^/pedido/([^/]+?)/?(?:/__data.json)?$",
