@@ -171,10 +171,11 @@
     "isEntry": true,
     "imports": [
       "_index.js",
+      "_escaping.js",
       "_shared-server.js"
     ],
     "css": [
-      "_app/immutable/assets/_page.D1f9J8cc.css"
+      "_app/immutable/assets/_page.B5fOBcLX.css"
     ]
   },
   "src/routes/carrinho/+page.svelte": {

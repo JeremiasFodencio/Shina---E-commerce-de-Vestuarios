@@ -2,6 +2,10 @@
   import { onMount } from 'svelte';
   import { admin, lerChave, salvarChave, sairAdmin } from '$lib/admin.js';
   import { brl } from '$lib/formato.js';
+  import { env } from '$env/dynamic/public';
+
+  // Modo demonstração: se esta variável existir, a chave aparece na tela de login
+  const chaveDemo = env.PUBLIC_ADMIN_DEMO_KEY ?? '';
 
   const STATUS = [
     ['pendente', 'Aguardando pagamento'],
@@ -221,6 +225,12 @@
     <label class="campo">Chave de administração
       <input type="password" bind:value={chaveInput} required autocomplete="off" />
     </label>
+    {#if chaveDemo}
+      <p class="demo">
+        Modo demonstração: a chave de acesso é <code>{chaveDemo}</code>
+        <button type="button" class="remover" onclick={() => (chaveInput = chaveDemo)}>Preencher</button>
+      </p>
+    {/if}
     <button class="btn btn-primario">Entrar</button>
   </form>
 {:else}
@@ -393,6 +403,8 @@
 {/if}
 
 <style>
+  .demo { background: var(--fita); color: var(--tinta); padding: 0.75rem 1rem; margin: 0 0 1rem; }
+  .demo code { font-weight: 700; user-select: all; overflow-wrap: anywhere; }
   .abas { display: flex; gap: 0.5rem; align-items: center; margin: 1.5rem 0; flex-wrap: wrap; }
   .bloco { background: var(--branco); border: 2px solid var(--linha); padding: 1rem 1.25rem; margin-bottom: 1rem; }
   summary { cursor: pointer; font-weight: 600; }
